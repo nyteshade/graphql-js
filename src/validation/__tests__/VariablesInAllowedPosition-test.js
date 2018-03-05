@@ -91,7 +91,7 @@ describe('Validate: Variables are in allowed positions', () => {
     );
   });
 
-  it('Int => Int! with default', () => {
+  it('Int => Int! with non-null default value', () => {
     expectPassesRule(
       VariablesInAllowedPosition,
       `
@@ -218,6 +218,26 @@ describe('Validate: Variables are in allowed positions', () => {
       VariablesInAllowedPosition,
       `
       query Query($intArg: Int) {
+        complicatedArgs {
+          nonNullIntArgField(nonNullIntArg: $intArg)
+        }
+      }
+    `,
+      [
+        {
+          message: badVarPosMessage('intArg', 'Int', 'Int!'),
+          locations: [{ line: 2, column: 19 }, { line: 4, column: 45 }],
+          path: undefined,
+        },
+      ],
+    );
+  });
+
+  it('Int => Int! with null default value', () => {
+    expectFailsRule(
+      VariablesInAllowedPosition,
+      `
+      query Query($intArg: Int = null) {
         complicatedArgs {
           nonNullIntArgField(nonNullIntArg: $intArg)
         }
